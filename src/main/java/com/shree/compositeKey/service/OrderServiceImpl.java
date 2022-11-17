@@ -2,14 +2,21 @@ package com.shree.compositeKey.service;
 
 import com.shree.compositeKey.dto.OrderDTO;
 import com.shree.compositeKey.entity.Order;
+import com.shree.compositeKey.entity.OrderItem;
 import com.shree.compositeKey.mapper.OrderMapper;
 import com.shree.compositeKey.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +32,9 @@ public class OrderServiceImpl implements OrderService{
         Optional<Order> optionalOrder = orderRepo.findById(id);
         if (optionalOrder.isPresent()) {
             order = optionalOrder.get();
-            return orderMapper.toDto(order);
+            OrderDTO orderDTO = orderMapper.toDto(order);
+            calculateOrderTotal(orderDTO);
+            return orderDTO;
         }
         else {
             return null;
@@ -71,5 +80,25 @@ public class OrderServiceImpl implements OrderService{
         Order order = orderMapper.toEntity(orderDTO);
         order = orderRepo.save(order);
         return orderMapper.toDto(order);
+    }
+
+    @Override
+    public List<OrderDTO> getAll(Pageable pageable) {
+        Page<Order> pageElements = orderRepo.findAll(pageable);
+        List<Order> orderList = pageElements.getContent();
+        if(!CollectionUtils.isEmpty(orderList)){
+            return orderList.stream().map(order -> orderMapper.toDto(order))
+                    .map(this::calculateOrderTotal)
+                    .collect(Collectors.toList());
+        }
+        return null;
+    }
+
+    private OrderDTO calculateOrderTotal(OrderDTO order){
+        Set<OrderItem> orderItemList = order.getOrderItems();
+        if(!CollectionUtils.isEmpty(orderItemList)){
+            order.setTotal(orderItemList.stream().mapToDouble(o->o.getQuantity()*o.getItem().getPrice()).sum());
+        }
+        return order;
     }
 }

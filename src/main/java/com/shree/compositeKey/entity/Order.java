@@ -1,11 +1,11 @@
 package com.shree.compositeKey.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.Set;
 
-import static javax.persistence.FetchType.EAGER;
 import static javax.persistence.GenerationType.SEQUENCE;
 
 
@@ -30,6 +30,7 @@ public class Order {
     private Customer customer;
 
     @OneToMany(mappedBy = "order")
+    @JsonIgnoreProperties({"order"})
     private Set<OrderItem> orderItems;
 
     @Override
