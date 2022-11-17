@@ -1,5 +1,6 @@
 package com.shree.compositeKey.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,7 +26,7 @@ public class OrderItem {
 
     @ManyToOne(cascade = ALL)
     @JoinColumn(name = "order_id")
-    @JsonIgnoreProperties({"orderItems"})
+    @JsonIgnore
     private Order order;
 
     @ManyToOne(cascade = MERGE)

@@ -100,7 +100,6 @@ public class CompositeKeyApplication {
 		OrderItemDTO orderItemDTO = orderItemService.toDto(orderItem);
 		orderItemService.saveOrderItem(orderItemDTO);
 		OrderDTO orderSaved = orderService.getOrder(1L);
-		orderSaved.getOrderItems().stream().map(OrderItem::getItem);
 	}
 
 }
