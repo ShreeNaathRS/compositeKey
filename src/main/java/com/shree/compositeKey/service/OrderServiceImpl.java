@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.Optional;
 
 @Service
@@ -18,6 +19,7 @@ public class OrderServiceImpl implements OrderService{
     private final OrderMapper orderMapper;
 
     @Override
+    @Transactional
     public OrderDTO getOrder(Long id) {
         Order order;
         Optional<Order> optionalOrder = orderRepo.findById(id);

@@ -3,8 +3,13 @@ package com.shree.compositeKey;
 import com.shree.compositeKey.dto.CustomerDTO;
 import com.shree.compositeKey.dto.ItemDTO;
 import com.shree.compositeKey.dto.OrderDTO;
+import com.shree.compositeKey.dto.OrderItemDTO;
+import com.shree.compositeKey.entity.Item;
+import com.shree.compositeKey.entity.Order;
+import com.shree.compositeKey.entity.OrderItem;
 import com.shree.compositeKey.service.CustomerService;
 import com.shree.compositeKey.service.ItemService;
+import com.shree.compositeKey.service.OrderItemService;
 import com.shree.compositeKey.service.OrderService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -26,11 +31,11 @@ public class CompositeKeyApplication {
 	}
 
 	@Bean
-	CommandLineRunner run(ItemService itemService, CustomerService customerService, OrderService orderService) {
+	CommandLineRunner run(ItemService itemService, CustomerService customerService, OrderService orderService, OrderItemService orderItemService) {
 		return args -> {
 			createItem(itemService);
 			createCustomer(customerService);
-			createOrder(customerService, orderService);
+			createOrder(customerService, orderService, itemService, orderItemService);
 		};
 	}
 
@@ -83,14 +88,19 @@ public class CompositeKeyApplication {
 		});
 	}
 
-	private void createOrder(CustomerService customerService, OrderService orderService) throws Exception {
+	private void createOrder(CustomerService customerService, OrderService orderService, ItemService itemService, OrderItemService orderItemService) throws Exception {
 		CustomerDTO customerDTO = customerService.findByPhoneNumber("9940409540");
 		OrderDTO orderDTO = new OrderDTO();
 		orderDTO.setCustomer(customerService.toEntity(customerDTO));
 		orderDTO.setDate(now());
-		orderDTO.setTotal(0.0);;
-		orderService.saveOrder(orderDTO);
-		OrderDTO order = orderService.getOrder(1L);
+		orderDTO.setTotal(0.0);
+		Item item1 = itemService.toEntity(itemService.findById(1L));
+		Order order = orderService.toEntity(orderDTO);
+		OrderItem orderItem = new OrderItem(null, order, item1,2);
+		OrderItemDTO orderItemDTO = orderItemService.toDto(orderItem);
+		orderItemService.saveOrderItem(orderItemDTO);
+		OrderDTO orderSaved = orderService.getOrder(1L);
+		orderSaved.getOrderItems().stream().map(OrderItem::getItem);
 	}
 
 }
