@@ -2,6 +2,7 @@ package com.shree.compositeKey.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.shree.compositeKey.entityListener.OrderItemListener;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,6 +13,7 @@ import static javax.persistence.CascadeType.MERGE;
 import static javax.persistence.GenerationType.SEQUENCE;
 
 @Entity(name = "order_items")
+@EntityListeners(OrderItemListener.class)
 @AllArgsConstructor
 @NoArgsConstructor
 @Data

@@ -137,7 +137,6 @@ public class CompositeKeyApplication {
 					throw new RuntimeException(e);
 				}
 			});
-
 		});
 	}
 
