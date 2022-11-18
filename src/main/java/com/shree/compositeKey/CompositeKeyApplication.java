@@ -3,7 +3,6 @@ package com.shree.compositeKey;
 import com.shree.compositeKey.dto.CustomerDTO;
 import com.shree.compositeKey.dto.ItemDTO;
 import com.shree.compositeKey.dto.OrderDTO;
-import com.shree.compositeKey.dto.OrderItemDTO;
 import com.shree.compositeKey.entity.Item;
 import com.shree.compositeKey.entity.Order;
 import com.shree.compositeKey.entity.OrderItem;
@@ -11,13 +10,14 @@ import com.shree.compositeKey.service.CustomerService;
 import com.shree.compositeKey.service.ItemService;
 import com.shree.compositeKey.service.OrderItemService;
 import com.shree.compositeKey.service.OrderService;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static com.shree.compositeKey.enums.Category.*;
 import static java.time.LocalDate.now;
@@ -43,6 +43,8 @@ public class CompositeKeyApplication {
 		List<CustomerDTO> customerDTOList = new ArrayList<>();
 		customerDTOList.add(new CustomerDTO(null, "Shree Naath R S","9940409540","rsshreenaath@gmail.com","2-Thiruvalluvar Nagar","Madhavaram Milk Colony","Tamil Nadu","Chennai","600051"));
 		customerDTOList.add(new CustomerDTO(null, "Guru Prasad R S","9940401362","gurursprasad@gmail.com","2-Thiruvalluvar Nagar","Madhavaram Milk Colony","Tamil Nadu","Chennai","600051"));
+		customerDTOList.add(new CustomerDTO(null, "Sridhar C R","9444346591","sridhar10051960@gmail.com","2-Thiruvalluvar Nagar","Madhavaram Milk Colony","Tamil Nadu","Chennai","600051"));
+		customerDTOList.add(new CustomerDTO(null, "Padma V S","9445309945","vspadma1966@gmail.com","2-Thiruvalluvar Nagar","Madhavaram Milk Colony","Tamil Nadu","Chennai","600051"));
 		customerDTOList.add(new CustomerDTO(null, "Deeps","8072010867",null,"10-3rd cross street, Lakshmi Nagar","Lakshmipuram Road","Tamil Nadu","Chennai","600056"));
 		customerDTOList.forEach(customer-> {
 			try {
@@ -88,18 +90,62 @@ public class CompositeKeyApplication {
 		});
 	}
 
-	private void createOrder(CustomerService customerService, OrderService orderService, ItemService itemService, OrderItemService orderItemService) throws Exception {
-		CustomerDTO customerDTO = customerService.findByPhoneNumber("9940409540");
-		OrderDTO orderDTO = new OrderDTO();
-		orderDTO.setCustomer(customerService.toEntity(customerDTO));
-		orderDTO.setDate(now());
-		orderDTO.setTotal(0.0);
-		Item item1 = itemService.toEntity(itemService.findById(1L));
-		Order order = orderService.toEntity(orderDTO);
-		OrderItem orderItem = new OrderItem(null, order, item1,2);
-		OrderItemDTO orderItemDTO = orderItemService.toDto(orderItem);
-		orderItemService.saveOrderItem(orderItemDTO);
-		OrderDTO orderSaved = orderService.getOrder(1L);
+	private void createOrder(CustomerService customerService, OrderService orderService, ItemService itemService, OrderItemService orderItemService) {
+		List<OrderDetails> orderDetailsList = new ArrayList<>();
+		Map<Long, Integer> itemQuantity1 = new HashMap<>();
+		itemQuantity1.put(1L, 2);
+		itemQuantity1.put(2L, 1);
+		Map<Long, Integer> itemQuantity2 = new HashMap<>();
+		itemQuantity2.put(7L, 1);
+		itemQuantity2.put(10L, 4);
+		itemQuantity2.put(12L, 3);
+		itemQuantity2.put(13L, 2);
+		itemQuantity2.put(21L, 5);
+		itemQuantity2.put(23L, 3);
+		Map<Long, Integer> itemQuantity3 = new HashMap<>();
+		itemQuantity3.put(4L, 2);
+		itemQuantity3.put(8L, 1);
+		itemQuantity3.put(10L, 10);
+		orderDetailsList.add(new OrderDetails("9940409540", itemQuantity1));
+		orderDetailsList.add(new OrderDetails("9445309945", itemQuantity2));
+		orderDetailsList.add(new OrderDetails("9444346591", itemQuantity3));
+		createActualOrder(customerService, orderService, itemService, orderItemService, orderDetailsList);
 	}
 
+	private void createActualOrder(CustomerService customerService, OrderService orderService, ItemService itemService, OrderItemService orderItemService,
+								   List<OrderDetails> orderDetails) {
+		orderDetails.forEach(o -> {
+			CustomerDTO customerDTO = customerService.findByPhoneNumber(o.getCustomerPhoneNumber());
+			OrderDTO orderDTO = new OrderDTO();
+			orderDTO.setCustomer(customerService.toEntity(customerDTO));
+			orderDTO.setDate(now());
+			orderDTO.setTotal(0.0);
+			orderDTO.setOrderItems(new HashSet<>());
+			Order order = orderService.toEntity(orderDTO);
+			try {
+				order = orderService.toEntity(orderService.saveOrder(orderService.toDto(order)));
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+			Order finalOrder = order;
+			o.getItemQuantity().forEach((itemId, quantity) -> {
+				Item item = itemService.toEntity(itemService.findById(itemId));
+				OrderItem orderItem = new OrderItem(null, finalOrder, item, quantity);
+				try {
+					orderItemService.saveOrderItem(orderItemService.toDto(orderItem));
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			});
+
+		});
+	}
+
+}
+
+@Data
+@AllArgsConstructor
+class OrderDetails {
+	private String customerPhoneNumber;
+	private Map<Long, Integer> itemQuantity;
 }

@@ -35,7 +35,7 @@ public class Order {
 
     @Override
     public int hashCode(){
-        return this.getId().hashCode();
+        return this.getId() == null? 0 : this.getId().hashCode();
     }
 
 }
