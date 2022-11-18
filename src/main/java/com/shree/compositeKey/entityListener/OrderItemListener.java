@@ -27,7 +27,7 @@ public class OrderItemListener {
             OrderDTO orderDTO = orderService.getOrder(orderItem.getOrder().getId());
             Order order = orderService.toEntity(orderDTO);
             Double currentOrderTotal = order.getTotal();
-            log.debug("Back updating order total : Adding {} to current orderTotal of {}", currentItemPrice, currentOrderTotal);
+            log.debug("Back updating order total : Adding {} to current orderTotal of {} for order {}", currentItemPrice, currentOrderTotal, order.getId());
             order.setTotal(orderDTO.getTotal() + currentItemPrice);
             orderService.update(orderService.toDto(order));
         }
