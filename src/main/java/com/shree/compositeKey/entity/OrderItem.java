@@ -6,11 +6,13 @@ import com.shree.compositeKey.entityListener.OrderItemListener;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 
-import static javax.persistence.CascadeType.MERGE;
 import static javax.persistence.GenerationType.SEQUENCE;
+import static org.hibernate.annotations.CascadeType.LOCK;
+import static org.hibernate.annotations.CascadeType.MERGE;
 
 @Entity(name = "order_items")
 @EntityListeners(OrderItemListener.class)
@@ -25,12 +27,12 @@ public class OrderItem {
     @Column(name = "order_item_id")
     private Long id;
 
-    @ManyToOne(cascade = MERGE)
+    @ManyToOne
     @JoinColumn(name = "order_id")
     @JsonIgnore
     private Order order;
 
-    @ManyToOne(cascade = MERGE)
+    @ManyToOne
     @JoinColumn(name = "item_id")
     @JsonIgnoreProperties("orderItems")
     private Item item;
