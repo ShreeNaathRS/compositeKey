@@ -1,11 +1,14 @@
 package com.shree.compositeKey.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.shree.compositeKey.enums.Category;
 import lombok.Data;
 
 import javax.persistence.*;
 
 import java.time.LocalDate;
+import java.util.Set;
+
 import static javax.persistence.EnumType.STRING;
 import static javax.persistence.GenerationType.SEQUENCE;
 
@@ -53,4 +56,24 @@ public class Item {
     @Column(name = "item_manufactured_dt")
     private LocalDate manufacturedDate;
 
+    @OneToMany(mappedBy = "item")
+    @JsonIgnore
+    private Set<OrderItem> orderItems;
+
+    @Override
+    public String toString() {
+        return "Item{" +
+                "id=" + id +
+                ", category=" + category +
+                ", name='" + name + '\'' +
+                ", company='" + company + '\'' +
+                ", model='" + model + '\'' +
+                ", price=" + price +
+                ", weight=" + weight +
+                ", color='" + color + '\'' +
+                ", warranty=" + warranty +
+                ", warrantyEndDate=" + warrantyEndDate +
+                ", manufacturedDate=" + manufacturedDate +
+                '}';
+    }
 }

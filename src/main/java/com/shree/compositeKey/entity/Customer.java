@@ -44,4 +44,18 @@ public class Customer {
     @Column(name = "cust_pincode", nullable = false)
     private String pincode;
 
+    @Override
+    public String toString() {
+        return "Customer{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", email='" + email + '\'' +
+                ", addressLine1='" + addressLine1 + '\'' +
+                ", addressLine2='" + addressLine2 + '\'' +
+                ", state='" + state + '\'' +
+                ", city='" + city + '\'' +
+                ", pincode='" + pincode + '\'' +
+                '}';
+    }
 }
