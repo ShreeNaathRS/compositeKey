@@ -101,4 +101,9 @@ public class OrderServiceImpl implements OrderService{
         }
         return order;
     }
+
+    @Override
+    public OrderRepository getOrderRepo(){
+        return orderRepo;
+    }
 }

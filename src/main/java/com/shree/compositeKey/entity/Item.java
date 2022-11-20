@@ -1,6 +1,6 @@
 package com.shree.compositeKey.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.shree.compositeKey.enums.Category;
 import lombok.Data;
 
@@ -57,7 +57,23 @@ public class Item {
     private LocalDate manufacturedDate;
 
     @OneToMany(mappedBy = "item")
-    @JsonIgnoreProperties(value = { "order", "order.orderItems" }, allowSetters = true)
+    @JsonIgnore
     private Set<OrderItem> orderItems;
 
+    @Override
+    public String toString() {
+        return "Item{" +
+                "id=" + id +
+                ", category=" + category +
+                ", name='" + name + '\'' +
+                ", company='" + company + '\'' +
+                ", model='" + model + '\'' +
+                ", price=" + price +
+                ", weight=" + weight +
+                ", color='" + color + '\'' +
+                ", warranty=" + warranty +
+                ", warrantyEndDate=" + warrantyEndDate +
+                ", manufacturedDate=" + manufacturedDate +
+                '}';
+    }
 }

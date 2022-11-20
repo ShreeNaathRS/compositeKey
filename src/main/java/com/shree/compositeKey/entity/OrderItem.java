@@ -45,4 +45,13 @@ public class OrderItem {
         return this.getOrder() != null ? this.getOrder().hashCode(): 0  + (this.getItem() != null? this.getItem().hashCode():0);
     }
 
+    @Override
+    public String toString() {
+        return "OrderItem{" +
+                "id=" + id +
+                ", order=" + order +
+                ", item=" + item +
+                ", quantity=" + quantity +
+                '}';
+    }
 }

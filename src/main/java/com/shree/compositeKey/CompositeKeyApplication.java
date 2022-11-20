@@ -3,9 +3,11 @@ package com.shree.compositeKey;
 import com.shree.compositeKey.dto.CustomerDTO;
 import com.shree.compositeKey.dto.ItemDTO;
 import com.shree.compositeKey.dto.OrderDTO;
+import com.shree.compositeKey.entity.Customer;
 import com.shree.compositeKey.entity.Item;
 import com.shree.compositeKey.entity.Order;
 import com.shree.compositeKey.entity.OrderItem;
+import com.shree.compositeKey.enums.Category;
 import com.shree.compositeKey.service.CustomerService;
 import com.shree.compositeKey.service.ItemService;
 import com.shree.compositeKey.service.OrderItemService;
@@ -16,12 +18,15 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 import static com.shree.compositeKey.enums.Category.*;
 import static java.time.LocalDate.now;
 import static java.time.LocalDate.of;
+import static java.util.stream.Collectors.*;
 
 @SpringBootApplication
 public class CompositeKeyApplication {
@@ -36,6 +41,7 @@ public class CompositeKeyApplication {
 			createItem(itemService);
 			createCustomer(customerService);
 			createOrder(customerService, orderService, itemService, orderItemService);
+			streamExcersice(itemService, customerService, orderService, orderItemService);
 		};
 	}
 
@@ -106,9 +112,17 @@ public class CompositeKeyApplication {
 		itemQuantity3.put(4L, 2);
 		itemQuantity3.put(8L, 1);
 		itemQuantity3.put(10L, 10);
+		Map<Long, Integer> itemQuantity4 = new HashMap<>();
+		itemQuantity4.put(5L, 2);
+		itemQuantity4.put(21L, 2);
+		itemQuantity4.put(9L, 2);
+		itemQuantity4.put(13L, 3);
+		itemQuantity4.put(22L, 2);
+		itemQuantity4.put(8L, 1);
 		orderDetailsList.add(new OrderDetails("9940409540", itemQuantity1));
 		orderDetailsList.add(new OrderDetails("9445309945", itemQuantity2));
 		orderDetailsList.add(new OrderDetails("9444346591", itemQuantity3));
+		orderDetailsList.add(new OrderDetails("8072010867", itemQuantity4));
 		createActualOrder(customerService, orderService, itemService, orderItemService, orderDetailsList);
 	}
 
@@ -139,6 +153,76 @@ public class CompositeKeyApplication {
 			});
 		});
 	}
+
+	private void streamExcersice(ItemService itemService, CustomerService customerService, OrderService orderService, OrderItemService orderItemService) {
+//		exercise1(orderService);
+//		exercise2(orderService, TRAVEL);
+		excercise3(orderService, itemService);
+	}
+
+	private List<Order> getAllOrders(OrderService orderService){
+		return orderService.getOrderRepo().findAll();
+	}
+
+	private List<Item> getAllItems(ItemService itemService){
+		return itemService.findAll();
+	}
+
+	private Predicate<OrderItem> filterItemCategory(Category category){
+		return orderItem -> orderItem.getItem().getCategory().equals(category);
+	}
+
+//	Get customers who orders greater than 50000
+	private void exercise1(OrderService orderService) {
+		List<Order> allOrders = getAllOrders(orderService);
+		List<Customer> customerList = allOrders.stream()
+				.filter(order -> order.getTotal() > 50000)
+				.map(Order::getCustomer)
+				.collect(toList());
+		System.out.println(customerList);
+	}
+
+//	Get the customer who buys a given category the most
+	private void exercise2(OrderService orderService, Category category) {
+		List<Order> allOrders = getAllOrders(orderService);
+		Map<Customer, List<Order>> ordersGroupedByCustomer = allOrders.stream()
+				.filter(order -> order.getOrderItems().stream()
+						.anyMatch(filterItemCategory(category)))
+				.collect(groupingBy(Order::getCustomer));
+		Map<Customer, Integer> customerQuantity = ordersGroupedByCustomer.entrySet().stream()
+				.collect(toMap(Map.Entry::getKey, o -> o.getValue().stream()
+						.map(Order::getOrderItems)
+						.mapToInt(orderItems -> orderItems.stream()
+								.filter(filterItemCategory(category))
+								.mapToInt(OrderItem::getQuantity).sum()
+						).sum()
+				));
+		Customer customer = customerQuantity.entrySet().stream()
+				.max(Map.Entry.comparingByValue())
+				.map(Map.Entry::getKey)
+				.orElse(null);
+		System.out.println(customer);
+	}
+
+//	Get items that are not present in any order
+	private void excercise3(OrderService orderService, ItemService itemService) {
+		List<Item> allItems = getAllItems(itemService);
+		List<Order> allOrders = getAllOrders(orderService);
+		List<Item> unusedItems = allItems.stream()
+				.filter(item -> allOrders.stream()
+						.flatMap(order -> order.getOrderItems().stream())
+						.noneMatch(orderItem -> orderItem.getItem().getId().equals(item.getId())))
+				.collect(toList());
+		System.out.println(unusedItems);
+	}
+
+	// TODO: 20-11-2022 Complete the below excersices
+//1. Get items that was last sold before one month
+//2. Get orders in which any one item is expired
+//3. Get count of items sold based on category level
+//4. Get quantity of item sold the max per order
+//5. Get customer who has spent the most
+//6. Get total of all orders in the current month
 
 }
 
