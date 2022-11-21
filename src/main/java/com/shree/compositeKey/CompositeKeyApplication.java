@@ -18,9 +18,9 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 
 import static com.shree.compositeKey.enums.Category.*;
@@ -112,6 +112,7 @@ public class CompositeKeyApplication {
 		itemQuantity3.put(4L, 2);
 		itemQuantity3.put(8L, 1);
 		itemQuantity3.put(10L, 10);
+		itemQuantity3.put(2L, 1);
 		Map<Long, Integer> itemQuantity4 = new HashMap<>();
 		itemQuantity4.put(5L, 2);
 		itemQuantity4.put(21L, 2);
@@ -128,11 +129,18 @@ public class CompositeKeyApplication {
 
 	private void createActualOrder(CustomerService customerService, OrderService orderService, ItemService itemService, OrderItemService orderItemService,
 								   List<OrderDetails> orderDetails) {
+		AtomicInteger i= new AtomicInteger();
 		orderDetails.forEach(o -> {
+			i.getAndIncrement();
 			CustomerDTO customerDTO = customerService.findByPhoneNumber(o.getCustomerPhoneNumber());
 			OrderDTO orderDTO = new OrderDTO();
 			orderDTO.setCustomer(customerService.toEntity(customerDTO));
-			orderDTO.setDate(now());
+			if(i.get() == 1){
+				orderDTO.setDate(now().minusMonths(2));
+			}
+			else{
+				orderDTO.setDate(now());
+			}
 			orderDTO.setTotal(0.0);
 			orderDTO.setOrderItems(new HashSet<>());
 			Order order = orderService.toEntity(orderDTO);
@@ -157,7 +165,8 @@ public class CompositeKeyApplication {
 	private void streamExcersice(ItemService itemService, CustomerService customerService, OrderService orderService, OrderItemService orderItemService) {
 //		exercise1(orderService);
 //		exercise2(orderService, TRAVEL);
-		excercise3(orderService, itemService);
+//		exercise3(orderService, itemService);
+		exercise4(orderService, itemService);
 	}
 
 	private List<Order> getAllOrders(OrderService orderService){
@@ -172,7 +181,7 @@ public class CompositeKeyApplication {
 		return orderItem -> orderItem.getItem().getCategory().equals(category);
 	}
 
-//	Get customers who orders greater than 50000
+	//	Get customers who orders greater than 50000
 	private void exercise1(OrderService orderService) {
 		List<Order> allOrders = getAllOrders(orderService);
 		List<Customer> customerList = allOrders.stream()
@@ -182,7 +191,7 @@ public class CompositeKeyApplication {
 		System.out.println(customerList);
 	}
 
-//	Get the customer who buys a given category the most
+	//	Get the customer who buys a given category the most
 	private void exercise2(OrderService orderService, Category category) {
 		List<Order> allOrders = getAllOrders(orderService);
 		Map<Customer, List<Order>> ordersGroupedByCustomer = allOrders.stream()
@@ -204,8 +213,8 @@ public class CompositeKeyApplication {
 		System.out.println(customer);
 	}
 
-//	Get items that are not present in any order
-	private void excercise3(OrderService orderService, ItemService itemService) {
+	//	Get items that are not present in any order
+	private void exercise3(OrderService orderService, ItemService itemService) {
 		List<Item> allItems = getAllItems(itemService);
 		List<Order> allOrders = getAllOrders(orderService);
 		List<Item> unusedItems = allItems.stream()
@@ -216,13 +225,32 @@ public class CompositeKeyApplication {
 		System.out.println(unusedItems);
 	}
 
-	// TODO: 20-11-2022 Complete the below excersices
-//1. Get items that was last sold before one month
-//2. Get orders in which any one item is expired
-//3. Get count of items sold based on category level
-//4. Get quantity of item sold the max per order
-//5. Get customer who has spent the most
-//6. Get total of all orders in the current month
+	//	Get items that was last sold before one month
+	private void exercise4(OrderService orderService, ItemService itemService) {
+		List<Order> allOrders = getAllOrders(orderService);
+		List<Item> allItems = getAllItems(itemService);
+		Map<Boolean, List<Order>> partitionedOrders = allOrders.stream()
+				.collect(partitioningBy(order -> order.getDate().isBefore(now().minusMonths(1))));
+		Map<Boolean, List<Item>> partitionedItems = partitionedOrders.entrySet().stream()
+				.collect(toMap(Map.Entry::getKey, order -> order.getValue().stream()
+						.flatMap(o -> o.getOrderItems().stream()
+								.map(orderItem -> orderItem.getItem())).collect(toList())));
+		List<Long> itemIds = allItems.stream()
+				.map(Item::getId)
+				.filter(value -> partitionedItems.get(true).stream().anyMatch(item -> item.getId().equals(value))
+						&& partitionedItems.get(false).stream().noneMatch(item -> item.getId().equals(value)))
+				.collect(toList());
+		System.out.println(itemIds);
+	}
+
+	/*
+ TODO: 20-11-2022 Complete the below exercises
+1. Get orders in which any one item is expired
+2. Get count of items sold based on category level
+3. Get quantity of item sold the max per order
+4. Get customer who has spent the most
+5. Get total of all orders in the current month
+*/
 
 }
 
