@@ -181,7 +181,7 @@ public class CompositeKeyApplication {
 		return orderItem -> orderItem.getItem().getCategory().equals(category);
 	}
 
-//	Get customers who orders greater than 50000
+	//	Get customers who orders greater than 50000
 	private void exercise1(OrderService orderService) {
 		List<Order> allOrders = getAllOrders(orderService);
 		List<Customer> customerList = allOrders.stream()
@@ -191,7 +191,7 @@ public class CompositeKeyApplication {
 		System.out.println(customerList);
 	}
 
-//	Get the customer who buys a given category the most
+	//	Get the customer who buys a given category the most
 	private void exercise2(OrderService orderService, Category category) {
 		List<Order> allOrders = getAllOrders(orderService);
 		Map<Customer, List<Order>> ordersGroupedByCustomer = allOrders.stream()
@@ -213,7 +213,7 @@ public class CompositeKeyApplication {
 		System.out.println(customer);
 	}
 
-//	Get items that are not present in any order
+	//	Get items that are not present in any order
 	private void exercise3(OrderService orderService, ItemService itemService) {
 		List<Item> allItems = getAllItems(itemService);
 		List<Order> allOrders = getAllOrders(orderService);
@@ -225,7 +225,7 @@ public class CompositeKeyApplication {
 		System.out.println(unusedItems);
 	}
 
-//	Get items that was last sold before one month
+	//	Get items that was last sold before one month
 	private void exercise4(OrderService orderService, ItemService itemService) {
 		List<Order> allOrders = getAllOrders(orderService);
 		List<Item> allItems = getAllItems(itemService);
