@@ -26,6 +26,8 @@ import java.util.function.Predicate;
 import static com.shree.compositeKey.enums.Category.*;
 import static java.time.LocalDate.now;
 import static java.time.LocalDate.of;
+import static java.util.Comparator.comparingDouble;
+import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.*;
 
 @SpringBootApplication
@@ -166,7 +168,12 @@ public class CompositeKeyApplication {
 //		exercise1(orderService);
 //		exercise2(orderService, TRAVEL);
 //		exercise3(orderService, itemService);
-		exercise4(orderService, itemService);
+//		exercise4(orderService, itemService);
+//		exercise5(orderService);
+//		exercise6(orderService);
+//		exercise7(orderService);
+//		exercise8(orderService);
+		exercise9(orderService);
 	}
 
 	private List<Order> getAllOrders(OrderService orderService){
@@ -243,15 +250,59 @@ public class CompositeKeyApplication {
 		System.out.println(itemIds);
 	}
 
-	/*
- TODO: 20-11-2022 Complete the below exercises
-1. Get orders in which any one item is expired
-2. Get count of items sold based on category level
-3. Get quantity of item sold the max per order
-4. Get customer who has spent the most
-5. Get total of all orders in the current month
-*/
+	//	Get orders in which any one item is expired
+	private void exercise5(OrderService orderService) {
+		List<Order> allOrders = getAllOrders(orderService);
+		List<Order> orderList = allOrders.stream()
+				.filter(order -> order.getOrderItems().stream()
+						.anyMatch(orderItem -> orderItem.getItem().getWarranty() && orderItem.getItem().getWarrantyEndDate().isBefore(now())))
+				.collect(toList());
+		System.out.println(orderList);
+	}
 
+	//	Get count of items sold based on category level
+	private void exercise6(OrderService orderService) {
+		List<Order> allOrders = getAllOrders(orderService);
+		Map<Category, Long> categoryCountList = allOrders.stream()
+				.flatMap(order -> order.getOrderItems().stream())
+				.map(OrderItem::getItem)
+				.collect(groupingBy(Item::getCategory, counting()));
+		System.out.println(categoryCountList);
+	}
+
+	//	Get quantity of item sold the max per order
+	private void exercise7(OrderService orderService) {
+		List<Order> allOrders = getAllOrders(orderService);
+		OrderItem maxOrderQuantity = allOrders.stream()
+				.flatMap(order -> order.getOrderItems().stream())
+				.max(comparingInt(OrderItem::getQuantity))
+				.orElse(null);
+		System.out.println(maxOrderQuantity);
+	}
+
+	//	Get customer who has spent the most
+	private void exercise8(OrderService orderService) {
+		List<Order> allOrders = getAllOrders(orderService);
+		Map<Customer, List<Order>> groupByCustomer = allOrders.stream()
+				.collect(groupingBy(Order::getCustomer));
+		Map<Customer, Double> customerWiseSpend = groupByCustomer.entrySet().stream()
+				.collect(toMap(Map.Entry::getKey,
+						customerListEntry -> customerListEntry.getValue().stream().mapToDouble(Order::getTotal).sum()));
+		Map.Entry<Customer, Double> customerDoubleEntry = customerWiseSpend.entrySet().stream()
+				.max(comparingDouble(Map.Entry::getValue))
+				.orElse(null);
+		System.out.println(customerDoubleEntry);
+	}
+
+	//	Get total of all orders in the current month
+	private void exercise9(OrderService orderService) {
+		List<Order> allOrders = getAllOrders(orderService);
+		double sum = allOrders.stream()
+				.filter(order -> order.getDate().getMonth().equals(now().getMonth()) && order.getDate().getYear() == now().getYear())
+				.mapToDouble(Order::getTotal)
+				.sum();
+		System.out.println(sum);
+	}
 }
 
 @Data
