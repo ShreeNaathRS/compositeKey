@@ -165,14 +165,14 @@ public class CompositeKeyApplication {
 	}
 
 	private void streamExcersice(ItemService itemService, CustomerService customerService, OrderService orderService, OrderItemService orderItemService) {
-//		exercise1(orderService);
-//		exercise2(orderService, TRAVEL);
-//		exercise3(orderService, itemService);
-//		exercise4(orderService, itemService);
-//		exercise5(orderService);
-//		exercise6(orderService);
-//		exercise7(orderService);
-//		exercise8(orderService);
+		exercise1(orderService);
+		exercise2(orderService, TRAVEL);
+		exercise3(orderService, itemService);
+		exercise4(orderService, itemService);
+		exercise5(orderService);
+		exercise6(orderService);
+		exercise7(orderService);
+		exercise8(orderService);
 		exercise9(orderService);
 	}
 
@@ -195,6 +195,7 @@ public class CompositeKeyApplication {
 				.filter(order -> order.getTotal() > 50000)
 				.map(Order::getCustomer)
 				.collect(toList());
+		System.out.println("Exercise 1");
 		System.out.println(customerList);
 	}
 
@@ -217,6 +218,7 @@ public class CompositeKeyApplication {
 				.max(Map.Entry.comparingByValue())
 				.map(Map.Entry::getKey)
 				.orElse(null);
+		System.out.println("Exercise 2");
 		System.out.println(customer);
 	}
 
@@ -229,6 +231,7 @@ public class CompositeKeyApplication {
 						.flatMap(order -> order.getOrderItems().stream())
 						.noneMatch(orderItem -> orderItem.getItem().getId().equals(item.getId())))
 				.collect(toList());
+		System.out.println("Exercise 3");
 		System.out.println(unusedItems);
 	}
 
@@ -247,6 +250,7 @@ public class CompositeKeyApplication {
 				.filter(value -> partitionedItems.get(true).stream().anyMatch(item -> item.getId().equals(value))
 						&& partitionedItems.get(false).stream().noneMatch(item -> item.getId().equals(value)))
 				.collect(toList());
+		System.out.println("Exercise 4");
 		System.out.println(itemIds);
 	}
 
@@ -257,6 +261,7 @@ public class CompositeKeyApplication {
 				.filter(order -> order.getOrderItems().stream()
 						.anyMatch(orderItem -> orderItem.getItem().getWarranty() && orderItem.getItem().getWarrantyEndDate().isBefore(now())))
 				.collect(toList());
+		System.out.println("Exercise 5");
 		System.out.println(orderList);
 	}
 
@@ -267,6 +272,7 @@ public class CompositeKeyApplication {
 				.flatMap(order -> order.getOrderItems().stream())
 				.map(OrderItem::getItem)
 				.collect(groupingBy(Item::getCategory, counting()));
+		System.out.println("Exercise 6");
 		System.out.println(categoryCountList);
 	}
 
@@ -277,6 +283,7 @@ public class CompositeKeyApplication {
 				.flatMap(order -> order.getOrderItems().stream())
 				.max(comparingInt(OrderItem::getQuantity))
 				.orElse(null);
+		System.out.println("Exercise 7");
 		System.out.println(maxOrderQuantity);
 	}
 
@@ -291,6 +298,7 @@ public class CompositeKeyApplication {
 		Map.Entry<Customer, Double> customerDoubleEntry = customerWiseSpend.entrySet().stream()
 				.max(comparingDouble(Map.Entry::getValue))
 				.orElse(null);
+		System.out.println("Exercise 8");
 		System.out.println(customerDoubleEntry);
 	}
 
@@ -301,6 +309,7 @@ public class CompositeKeyApplication {
 				.filter(order -> order.getDate().getMonth().equals(now().getMonth()) && order.getDate().getYear() == now().getYear())
 				.mapToDouble(Order::getTotal)
 				.sum();
+		System.out.println("Exercise 9");
 		System.out.println(sum);
 	}
 }
