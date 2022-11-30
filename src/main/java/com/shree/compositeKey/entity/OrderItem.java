@@ -1,7 +1,7 @@
 package com.shree.compositeKey.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.shree.compositeKey.entityListener.OrderItemListener;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,12 +26,12 @@ public class OrderItem {
 
     @ManyToOne
     @JoinColumn(name = "order_id")
-    @JsonIgnore
+    @JsonBackReference
     private Order order;
 
     @ManyToOne
     @JoinColumn(name = "item_id")
-    @JsonIgnoreProperties("orderItems")
+    @JsonManagedReference
     private Item item;
 
     @Column(name = "order_qty")

@@ -1,6 +1,6 @@
 package com.shree.compositeKey.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -32,7 +32,7 @@ public class Order {
     private Customer customer;
 
     @OneToMany(mappedBy = "order", fetch = EAGER)
-    @JsonIgnoreProperties({"order"})
+    @JsonManagedReference
     private Set<OrderItem> orderItems;
 
     @Override
