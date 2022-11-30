@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 import static javax.persistence.FetchType.EAGER;
@@ -25,7 +25,7 @@ public class Order {
     private Double total;
 
     @Column(name = "order_date", nullable = false)
-    private LocalDate date;
+    private LocalDateTime date;
 
     @ManyToOne
     @JoinColumn(name = "order_cust_id", nullable = false)

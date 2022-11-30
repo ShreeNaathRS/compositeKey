@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Data
@@ -16,11 +16,11 @@ import java.util.Set;
 public class OrderDTO implements Serializable {
     private Long id;
     private Double total;
-    private LocalDate date;
+    private LocalDateTime date;
     private Customer customer;
     private Set<OrderItem> orderItems;
 
-    public OrderDTO(Long id, Double total, LocalDate date, Customer customer) {
+    public OrderDTO(Long id, Double total, LocalDateTime date, Customer customer) {
         this.id = id;
         this.total = total;
         this.date = date;

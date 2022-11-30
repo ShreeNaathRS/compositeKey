@@ -5,7 +5,7 @@ import com.shree.compositeKey.enums.Category;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 import static javax.persistence.EnumType.STRING;
@@ -50,10 +50,10 @@ public class Item {
     private Boolean warranty;
 
     @Column(name = "item_warranty_end_dt")
-    private LocalDate warrantyEndDate;
+    private LocalDateTime warrantyEndDate;
 
     @Column(name = "item_manufactured_dt")
-    private LocalDate manufacturedDate;
+    private LocalDateTime manufacturedDate;
 
     @OneToMany(mappedBy = "item")
     @JsonBackReference
