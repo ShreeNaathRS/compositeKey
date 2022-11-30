@@ -1,12 +1,8 @@
 package com.shree.compositeKey.dto;
 
-import com.shree.compositeKey.entity.Order;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.List;
 
 @Data
 public class CustomerDTO implements Serializable {

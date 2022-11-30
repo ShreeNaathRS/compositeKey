@@ -2,10 +2,9 @@ package com.shree.compositeKey.entity;
 
 import lombok.Data;
 
-import static javax.persistence.GenerationType.SEQUENCE;
-
 import javax.persistence.*;
-import java.util.List;
+
+import static javax.persistence.GenerationType.SEQUENCE;
 
 @Entity(name = "customer")
 @Table(uniqueConstraints = {

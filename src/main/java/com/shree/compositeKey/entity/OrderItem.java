@@ -6,13 +6,10 @@ import com.shree.compositeKey.entityListener.OrderItemListener;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 
 import static javax.persistence.GenerationType.SEQUENCE;
-import static org.hibernate.annotations.CascadeType.LOCK;
-import static org.hibernate.annotations.CascadeType.MERGE;
 
 @Entity(name = "order_items")
 @EntityListeners(OrderItemListener.class)
