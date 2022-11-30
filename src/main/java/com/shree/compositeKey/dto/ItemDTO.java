@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -21,6 +21,6 @@ public class ItemDTO implements Serializable {
     private Double weight;
     private String color;
     private Boolean warranty;
-    private LocalDate warrantyEndDate;
-    private LocalDate manufacturedDate;
+    private LocalDateTime warrantyEndDate;
+    private LocalDateTime manufacturedDate;
 }
