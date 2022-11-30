@@ -1,6 +1,6 @@
 package com.shree.compositeKey.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.shree.compositeKey.enums.Category;
 import lombok.Data;
 
@@ -56,7 +56,7 @@ public class Item {
     private LocalDate manufacturedDate;
 
     @OneToMany(mappedBy = "item")
-    @JsonIgnore
+    @JsonBackReference
     private Set<OrderItem> orderItems;
 
     @Override
